@@ -1,0 +1,17 @@
+{
+  "name": "simplerotamanager",
+  "description": "Prototype for shift scheduling software - OFI Rota Manager",
+  "main": "index.html",
+  "authors": [
+    "Omar Farooq Ilyas"
+  ],
+  "license": "OFI Software",
+  "homepage": "https://github.com/omarfi/simplerotamanager",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
