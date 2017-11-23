@@ -19,7 +19,7 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
     vm.slideboxScope = {
         addEvent: function (date) {
             var newEvent = {
-                title: 'Ola Nordmann',
+                title: '',
                 startsAt: new Date(date),
                 endsAt: new Date(date),
                 color: calendarConfig.colorTypes.important,

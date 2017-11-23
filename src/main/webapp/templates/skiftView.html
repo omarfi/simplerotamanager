@@ -1,23 +1,31 @@
 <div class="modal-header">
-    <input type="text" class="form-control modal-title" ng-model="vm.event.title">
+    <p for="ansattNavn">Ansatt navn:</p>
+    <input id="ansattNavn" type="text" class="form-control modal-title" ng-model="vm.event.title">
 </div>
 <div class="modal-body">
 
+    <div class="row">
+        <div class="col-md-3 col-md-offset-3 text-center">Start tid:</div>
+        <div class="col-md-3 text-center">Slutt tid:</div>
+    </div>
 
-    <div
-            uib-timepicker
-            ng-model="vm.event.startsAt"
-            hour-step="1"
-            minute-step="15"
-            show-meridian="true">
+    <div class="row">
+        <div id="startTid" class="col-md-3 col-md-offset-3"
+             uib-timepicker
+             ng-model="vm.event.startsAt"
+             hour-step="1"
+             minute-step="15"
+             show-meridian="false">
+        </div>
+
+        <div id="sluttTid" class="col-md-3"
+             uib-timepicker
+             ng-model="vm.event.endsAt"
+             minute-step="15"
+             show-meridian="false">
+        </div>
     </div>
-    <div
-            uib-timepicker
-            ng-model="vm.event.endsAt"
-            hour-step="1"
-            minute-step="15"
-            show-meridian="true">
-    </div>
+
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" ng-click="$close()">OK</button>
