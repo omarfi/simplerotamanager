@@ -5,8 +5,7 @@
                 ng-click="vm.templateScope.addEvent(vm.cell.date)">
             Legg til ny skift
         </button>
-        <div class="clearfix"></div>
-        <ul class="unstyled list-unstyled">
+        <ul class="unstyled list-unstyled" style="margin-top: 10px">
             <li
                     ng-repeat="event in vm.events | orderBy:'startsAt' track by event.calendarEventId"
                     ng-class="event.cssClass"
@@ -20,7 +19,7 @@
                         href="javascript:;"
                         class="event-item"
                         ng-click="vm.onEventClick({calendarEvent: event})">
-                    <span ng-bind-html="vm.calendarEventTitle.monthView(event) | calendarTrustAsHtml"></span>
+                    <span ng-bind-html="vm.templateScope.formatSkiftTitle(event) | calendarTrustAsHtml"></span>
                 </a>
 
                 <a

@@ -22,7 +22,6 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
                 title: '',
                 startsAt: new Date(date),
                 endsAt: new Date(date),
-                color: calendarConfig.colorTypes.important,
                 draggable: true,
                 resizable: true,
                 actions: [
@@ -38,6 +37,9 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
             };
             vm.events.push(newEvent);
             SkiftView.show(vm.events, newEvent);
+        },
+        formatSkiftTitle: function (event) {
+            return event.title + ' (' + moment(event.startsAt).format('HH:mm') + ' - ' + moment(event.endsAt).format('HH:mm') + ')';
         }
     };
 
