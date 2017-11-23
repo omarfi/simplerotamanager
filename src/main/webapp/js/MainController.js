@@ -24,22 +24,33 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
                 endsAt: new Date(date),
                 color: calendarConfig.colorTypes.important,
                 draggable: true,
-                resizable: true
+                resizable: true,
+                actions: [
+                    {
+                        label: '<i class=\'glyphicon glyphicon-pencil\'></i>',
+                        onClick: vm.eventEdited
+                    },
+                    {
+                        label: '<i class=\'glyphicon glyphicon-remove\'></i>',
+                        onClick: vm.eventDeleted
+                    }
+                ]
             };
             vm.events.push(newEvent);
-            SkiftView.show(newEvent.title, newEvent);
+            SkiftView.show(vm.events, newEvent);
         }
     };
 
     vm.eventClicked = function (event) {
-        SkiftView.show(event.title, event);
+        SkiftView.show(vm.events, event);
     };
 
-    vm.eventEdited = function (event) {
-        SkiftView.show(event.title, event);
+    vm.eventEdited = function (args) {
+        SkiftView.show(vm.events, args.calendarEvent);
     };
 
-    vm.eventDeleted = function (event) {
+    vm.eventDeleted = function (args) {
+        vm.events.splice(vm.events.indexOf(args.calendarEvent), 1);
     };
 
     vm.timespanClicked = function (date, cell) {

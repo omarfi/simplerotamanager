@@ -1,12 +1,12 @@
 SRMApp.factory('SkiftView', function($uibModal) {
 
-        function show(action, event) {
+        function show(events, newEvent) {
             return $uibModal.open({
                 templateUrl: 'templates/skiftView.html',
                 controller: function() {
                     var vm = this;
-                    vm.action = action;
-                    vm.event = event;
+                    vm.events = events;
+                    vm.event = newEvent;
                 },
                 controllerAs: 'vm'
             });
