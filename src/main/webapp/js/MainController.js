@@ -55,9 +55,9 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
         vm.events.splice(vm.events.indexOf(args.calendarEvent), 1);
     };
 
-    vm.timespanClicked = function (date, cell) {
+    vm.timespanClicked = function (date) {
         if (vm.calendarView === 'month') {
-            if (vm.viewDate !== date) {
+            if (vm.viewDate.getDate() !== date.getDate()) {
                 vm.viewDate = date;
                 vm.cellIsOpen = true;
             } else {
