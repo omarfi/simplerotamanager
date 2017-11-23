@@ -13,7 +13,6 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors) {
                     for (i = 0; i < vm.events.length; i++) {
                         assignedColors.push(vm.events[i].color);
                         if (vm.events[i].title === newEvent.title && vm.events[i].calendarEventId !== newEvent.calendarEventId) {
-                            console.log("Match found");
                             newEvent.color = vm.events[i].color;
                             return;
                         }
