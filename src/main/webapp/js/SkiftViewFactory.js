@@ -1,4 +1,4 @@
-SRMApp.factory('SkiftView', function ($uibModal, Colors) {
+SRMApp.factory('SkiftView', function ($uibModal, Colors, moment) {
 
     function show(events, newEvent) {
         return $uibModal.open({
@@ -7,7 +7,37 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors) {
                 var vm = this;
                 vm.events = events;
                 vm.event = newEvent;
-                vm.assignColor = function () {
+                vm.erHelgeskift = vm.event.startsAt.getDay() === 0 || vm.event.startsAt.getDay() === 6;
+                vm.heading = moment(vm.event.startsAt).format("dddd, Do MMMM YYYY");
+
+                vm.getDagPrefix = function () {
+                    switch (vm.event.startsAt.getDay()) {
+                        case 1:
+                            prefix = "man";
+                            break;
+                        case 2:
+                            prefix = "tirs";
+                            break;
+                        case 3:
+                            prefix = "ons";
+                            break;
+                        case 4:
+                            prefix = "tors";
+                            break;
+                        case 5:
+                            prefix = "fre";
+                            break;
+                        case 6:
+                            prefix = "lør";
+                            break;
+                        case 0:
+                            prefix = "søn";
+                            break;
+                    }
+                    return prefix;
+                };
+
+                function assignColor() {
                     var assignedColors = [];
                     var i;
                     for (i = 0; i < vm.events.length; i++) {
@@ -28,8 +58,43 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors) {
 
                     newEvent.color = Colors[0];
                 };
+
+                function kopierSkiftTil(ukedager) {
+                    var date;
+                    for (date = moment().startOf('month');
+                         date.month() === vm.event.startsAt.getMonth();
+                         date.add(1, 'd')) {
+
+                        if (date.date() === vm.event.startsAt.getDate()) {
+                            continue
+                        }
+
+                        if (ukedager.indexOf(date.day()) !== -1) {
+                            var copiedEvent = angular.copy(vm.event);
+                            copiedEvent.startsAt.setDate(date.date());
+                            copiedEvent.endsAt.setDate(date.date());
+                            vm.events.push(copiedEvent);
+                        }
+                    }
+                }
+
+                vm.lagre = function () {
+                    assignColor();
+                    if (vm.skiftFrekvens === 'ukentlig') {
+                        kopierSkiftTil([vm.event.startsAt.getDay()]);
+                    } else if (vm.skiftFrekvens === 'hverdager') {
+                        kopierSkiftTil([1, 2, 3, 4, 5]);
+                    } else if (vm.skiftFrekvens === 'helg') {
+                        kopierSkiftTil([0, 6]);
+                    } else if (vm.skiftFrekvens === 'daglig') {
+                        kopierSkiftTil([0, 1, 2, 3, 4, 5, 6]);
+                    }
+                };
+
             },
-            controllerAs: 'vm'
+            controllerAs: 'vm',
+            backdrop: 'static'
+
         });
     }
 
