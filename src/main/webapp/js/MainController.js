@@ -67,7 +67,6 @@ SRMApp.controller('MainController', function ($location, $http, moment, calendar
     };
 
     vm.generer = function () {
-        console.log(vm.events);
         var url = $location.absUrl() + "genererTjenesteplan";
 
         var config = {
