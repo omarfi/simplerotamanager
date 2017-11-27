@@ -1,4 +1,4 @@
-SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView) {
+SRMApp.controller('MainController', function ($location, $http, moment, calendarConfig, SkiftView) {
     var vm = this;
 
     vm.calendarView = 'month';
@@ -65,4 +65,23 @@ SRMApp.controller('MainController', function (moment, calendarConfig, SkiftView)
             }
         }
     };
+
+    vm.generer = function () {
+        console.log(vm.events);
+        var url = $location.absUrl() + "genererTjenesteplan";
+
+        var config = {
+            headers: {
+                'Accept': 'text/plain'
+            }
+        };
+
+        $http.post(url, vm.events, config).then(function (response) {
+            vm.postResultMessage = response.data;
+        }, function error(response) {
+            vm.postResultMessage = "Error with status: " + response.statusText;
+        });
+
+        console.log(vm.postResultMessage);
+    }
 });
