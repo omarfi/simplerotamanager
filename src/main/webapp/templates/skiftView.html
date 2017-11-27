@@ -8,13 +8,13 @@
     </div>
 
     <div class="row">
-        <div class="col-md-3 col-md-offset-1 text-center">Start tid:</div>
-        <div class="col-md-3 text-center">Slutt tid:</div>
-        <div class="col-md-3">Kopier til:</div>
+        <div class="col-xs-3 col-xs-offset-1 text-center">Start tid:</div>
+        <div class="col-xs-3 text-center">Slutt tid:</div>
+        <div class="col-xs-3">Kopier til:</div>
     </div>
 
     <div class="row">
-        <div id="startTid" class="col-md-3 col-md-offset-1"
+        <div id="startTid" class="col-xs-3 col-xs-offset-1"
              uib-timepicker
              ng-model="vm.event.startsAt"
              hour-step="1"
@@ -22,14 +22,14 @@
              show-meridian="false">
         </div>
 
-        <div id="sluttTid" class="col-md-3"
+        <div id="sluttTid" class="col-xs-3"
              uib-timepicker
              ng-model="vm.event.endsAt"
              minute-step="15"
              show-meridian="false">
         </div>
 
-        <div class="col-md-3">
+        <div class="col-xs-3">
             <div class="radio">
                 <label>
                     <input type="radio" name="ukentlig" value="ukentlig" ng-model="vm.skiftFrekvens">

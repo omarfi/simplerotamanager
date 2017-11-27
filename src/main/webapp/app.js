@@ -1,6 +1,6 @@
 var SRMApp = angular
-    .module('simplerotamanager', ['mwl.calendar', 'ngAnimate', 'ui.bootstrap'])
-    .config(['calendarConfig', function (calendarConfig) {
+    .module('simplerotamanager', ['mwl.calendar', 'ngAnimate', 'ui.bootstrap', 'ngTouch'])
+    .config(['calendarConfig', function (calendarConfig, $touchProvider) {
         calendarConfig.dateFormatter = 'moment';
         calendarConfig.templates.calendarSlideBox = '/templates/calendarSlidebox.html';
         calendarConfig.i18nStrings.weekNumber = 'Uke {week}';
@@ -13,4 +13,7 @@ var SRMApp = angular
         });
         moment.locale('nb');
 
+    }])
+    .config(['$touchProvider', function ($touchProvider) {
+        $touchProvider.ngClickOverrideEnabled(true);
     }]);
