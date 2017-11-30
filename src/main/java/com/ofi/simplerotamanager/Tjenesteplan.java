@@ -1,12 +1,12 @@
 package com.ofi.simplerotamanager;
 
-
+import java.time.LocalDate;
 import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Tjenesteplan {
+class Tjenesteplan {
 
     private List<Skift> skifter;
 
@@ -15,19 +15,22 @@ public class Tjenesteplan {
         this.skifter = skifter;
     }
 
-    public Month getMonth() {
+    Month getManed() {
         return skifter.get(0).getStartTid().getMonth();
     }
 
-    public int getYear() {
+    int getAar() {
         return skifter.get(0).getStartTid().getYear();
     }
 
-    public List<Skift> getSkifter() {
-        return skifter;
+    List<String> getAnsatte() {
+        return skifter.stream().map(Skift::getAnsattNavn).distinct().collect(Collectors.toList());
     }
 
-    public List<String> getAnsatte() {
-        return skifter.stream().map(Skift::getAnsattNavn).distinct().collect(Collectors.toList());
+    List<Skift> getSkifterForAnsattForDato(String ansattNavn, LocalDate dato) {
+        return skifter.stream()
+                .filter(skift -> skift.getAnsattNavn().equals(ansattNavn))
+                .filter(skift -> skift.getStartTid().toLocalDate().isEqual(dato))
+                .collect(Collectors.toList());
     }
 }

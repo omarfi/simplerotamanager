@@ -1,4 +1,4 @@
-SRMApp.controller('MainController', function ($location, $http, moment, calendarConfig, SkiftView) {
+SRMApp.controller('MainController', function ($location, $http, $window, moment, calendarConfig, SkiftView) {
     var vm = this;
 
     vm.calendarView = 'month';
@@ -66,6 +66,21 @@ SRMApp.controller('MainController', function ($location, $http, moment, calendar
         }
     };
 
+    function createRequestData() {
+        var data = angular.copy(vm.events);
+
+        var options = {
+            hour12: false, year: 'numeric', month: "2-digit", day: "2-digit",
+            hour: "2-digit", minute: "2-digit", second: "2-digit"
+        };
+
+        for (var i = 0; i < vm.events.length; i++) {
+            data[i].startsAt = vm.events[i].startsAt.toLocaleString({}, options);
+            data[i].endsAt = vm.events[i].endsAt.toLocaleString({}, options);
+        }
+        return data;
+    }
+
     vm.generer = function () {
         var url = $location.absUrl() + "genererTjenesteplan";
 
@@ -75,12 +90,15 @@ SRMApp.controller('MainController', function ($location, $http, moment, calendar
             }
         };
 
-        $http.post(url, vm.events, config).then(function (response) {
-            vm.postResultMessage = response.data;
+        $http.post(url, createRequestData(), config).then(function (response) {
+            if (response.status === 200) {
+                $window.location.href = $location.absUrl() + "/lastned";
+            }
+
         }, function error(response) {
-            vm.postResultMessage = "Error with status: " + response.statusText;
+            vm.postResultMessage = "Feil med status: " + response.statusText;
         });
 
-        console.log(vm.postResultMessage);
+
     }
 });
