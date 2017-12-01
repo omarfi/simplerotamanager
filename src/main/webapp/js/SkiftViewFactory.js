@@ -61,7 +61,7 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors, moment) {
 
                 function kopierSkiftTil(ukedager) {
                     var date;
-                    for (date = moment().startOf('month');
+                    for (date = moment(vm.event.startsAt).startOf('month');
                          date.month() === vm.event.startsAt.getMonth();
                          date.add(1, 'd')) {
 

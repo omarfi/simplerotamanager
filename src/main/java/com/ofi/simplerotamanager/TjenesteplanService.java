@@ -112,11 +112,15 @@ public class TjenesteplanService {
             }
         }*/
 
-        /*for (int i = 0; i < reportType.getColumns().size(); i++) {
-            sheet.autoSizeColumn(i);
-            sheet.setColumnWidth(i, sheet.getColumnWidth(i) + 700);
-        }*/
+        resizeColumns(sheet, ansatte.size());
         return writeExcelToBytes(wb);
+    }
+
+    private void resizeColumns(XSSFSheet sheet, int noOfColumns) {
+        for (int columnIndex = 0; columnIndex <= noOfColumns; columnIndex++) {
+            sheet.autoSizeColumn(columnIndex);
+            sheet.setColumnWidth(columnIndex, sheet.getColumnWidth(columnIndex) + 700);
+        }
     }
 
     private void genererHeaderRad(List<String> ansatte, XSSFSheet sheet) {
