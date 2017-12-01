@@ -27,6 +27,12 @@ class Tjenesteplan {
         return skifter.stream().map(Skift::getAnsattNavn).distinct().collect(Collectors.toList());
     }
 
+    List<Skift> getSkifterForAnsatt(String ansattNavn) {
+        return skifter.stream()
+                .filter(skift -> skift.getAnsattNavn().equals(ansattNavn))
+                .collect(Collectors.toList());
+    }
+
     List<Skift> getSkifterForAnsattForDato(String ansattNavn, LocalDate dato) {
         return skifter.stream()
                 .filter(skift -> skift.getAnsattNavn().equals(ansattNavn))
