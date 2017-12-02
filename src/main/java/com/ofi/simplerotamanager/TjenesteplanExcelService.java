@@ -34,14 +34,48 @@ public class TjenesteplanExcelService {
         customizePrintSetup(sheet);
 
         List<String> ansatte = tjenesteplan.getAnsatte();
-
         int totalNoOfColumns = (ansatte.size() * 2) + 2;
         int rowIndex = 0;
 
         generateTitleRow(tjenesteplan, wb, sheet, totalNoOfColumns, rowIndex);
         generateHeaderRow(ansatte, sheet, ++rowIndex);
+        rowIndex = generateDataRows(tjenesteplan, wb, sheet, ansatte, ++rowIndex);
+        generateTrailerRow(tjenesteplan, sheet, ansatte, rowIndex);
 
-        rowIndex++;
+        resizeColumnsToFitContent(sheet, totalNoOfColumns);
+        return writeExcelToBytes(wb);
+    }
+
+    private void generateTitleRow(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, int totalNoOfColumns, int rowIndex) {
+        XSSFRow titleRow = createCommonStyleRow(sheet, rowIndex);
+        titleRow.setHeight((short) 900);
+
+        Cell cell = titleRow.createCell(0);
+        cell.setCellValue(tjenesteplan.toString());
+
+        Font font = wb.createFont();
+        font.setBold(true);
+        font.setFontHeight((short) 300);
+        CellUtil.setFont(cell, font);
+        CellUtil.setVerticalAlignment(cell, VerticalAlignment.CENTER);
+        CellUtil.setAlignment(cell, HorizontalAlignment.CENTER);
+
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, totalNoOfColumns - 1));
+    }
+
+    private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet, int rowIndex) {
+        XSSFRow header = createCommonStyleRow(sheet, rowIndex);
+
+        createCommonStyleCell(header, 0).setCellValue("DAG");
+        createCommonStyleCell(header, 1).setCellValue("DATO");
+
+        for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
+            createCommonStyleCell(header, columnIndex).setCellValue(ansatte.get(ansattIndex));
+            createCommonStyleCell(header, columnIndex + 1).setCellValue("T");
+        }
+    }
+
+    private int generateDataRows(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
         for (int dateIndex = 1; dateIndex <= tjenesteplan.getManed().length(Year.isLeap(tjenesteplan.getAar())); dateIndex++, rowIndex++) {
             XSSFRow row = createCommonStyleRow(sheet, rowIndex);
             LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), dateIndex);
@@ -61,39 +95,37 @@ public class TjenesteplanExcelService {
                 }
 
                 double hours = convertToHoursRoundedToNearestQuarter(totalDuration);
+                Cell cellHours = createCommonStyleCell(row, columnIndex + 1);
                 if (hours != 0) {
-                    createCommonStyleCell(row, columnIndex + 1).setCellValue(hours % 1 == 0 ? (int) hours : hours);
+                    cellHours.setCellValue(hours % 1 == 0 ? (int) hours : hours);
                 }
             }
         }
+        return rowIndex;
+    }
 
-        generateTrailerRow(tjenesteplan, sheet, ansatte, rowIndex);
+    private void generateTrailerRow(Tjenesteplan tjenesteplan, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
+        XSSFRow trailerRow = createCommonStyleRow(sheet, rowIndex);
+        createCommonStyleCell(trailerRow, 0).setCellValue("SUM");
+        createCommonStyleCell(trailerRow, 1);
 
-       /* CellStyle cellStyleDate = wb.createCellStyle();
-        cellStyleDate.setDataFormat(wb.createDataFormat().getFormat(DateFormatConverter.convert(Locale.getDefault(), "hh:MM:ss")));
+        for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
+            createCommonStyleCell(trailerRow, columnIndex);
 
-        for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
-            XSSFRow xssfRow = sheet.createRow(rowIndex + 1);
-            List<String> values = rows.get(rowIndex).getValues();
+            List<Duration> skiftDuartions = tjenesteplan
+                    .getSkifterForAnsatt(ansatte.get(ansattIndex))
+                    .stream()
+                    .map(Skift::getDuration)
+                    .collect(Collectors.toList());
 
-            for (int columnIndex = 0; columnIndex < values.size(); columnIndex++) {
-                Cell cell = xssfRow.createCell(columnIndex);
-
-                Object formattedValue = reportType.getDataFormatter().formatValue(reportType.getColumns().get(columnIndex), values.get(columnIndex));
-
-                if (formattedValue instanceof Date) {
-                    cell.setCellValue((Date) formattedValue);
-                    cell.setCellStyle(cellStyleDate);
-                } else if (formattedValue instanceof Integer) {
-                    cell.setCellValue((int) formattedValue);
-                } else {
-                    cell.setCellValue((String) formattedValue);
-                }
+            Duration totalDuration = Duration.ZERO;
+            for (Duration duration : skiftDuartions) {
+                totalDuration = totalDuration.plus(duration);
             }
-        }*/
 
-        resizeColumnsToFitContent(sheet, totalNoOfColumns);
-        return writeExcelToBytes(wb);
+            double sumHours = convertToHoursRoundedToNearestQuarter(totalDuration);
+            createCommonStyleCell(trailerRow, columnIndex + 1).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
+        }
     }
 
     private void customizePrintSetup(XSSFSheet sheet) {
@@ -111,59 +143,14 @@ public class TjenesteplanExcelService {
         sheet.getPrintSetup().setPaperSize(PaperSize.A4_PAPER);
     }
 
-    private void generateTitleRow(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, int totalNoOfColumns, int rowIndex) {
-        XSSFRow titleRow = createCommonStyleRow(sheet, rowIndex);
-        titleRow.setHeight((short) 900);
-
-        Cell cell = createCommonStyleCell(titleRow, 0);
-        cell.setCellValue(tjenesteplan.toString());
-
-        Font font = wb.createFont();
-        font.setBold(true);
-        font.setFontHeight((short) 300);
-        CellUtil.setFont(cell, font);
-        CellUtil.setVerticalAlignment(cell, VerticalAlignment.CENTER);
-
-        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, totalNoOfColumns - 1));
-    }
-
-    private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet, int rowIndex) {
-        XSSFRow header = createCommonStyleRow(sheet, rowIndex);
-
-        createCommonStyleCell(header, 0).setCellValue("DAG");
-        createCommonStyleCell(header, 1).setCellValue("DATO");
-
-        for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-            createCommonStyleCell(header, columnIndex).setCellValue(ansatte.get(ansattIndex));
-            createCommonStyleCell(header, columnIndex + 1).setCellValue("T");
-        }
-    }
-
-    private void generateTrailerRow(Tjenesteplan tjenesteplan, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
-        XSSFRow trailerRow = createCommonStyleRow(sheet, rowIndex);
-        createCommonStyleCell(trailerRow, 0).setCellValue("SUM");
-
-        for (int ansattIndex = 0, columnIndex = 3; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-            List<Duration> skiftDuartions = tjenesteplan
-                    .getSkifterForAnsatt(ansatte.get(ansattIndex))
-                    .stream()
-                    .map(Skift::getDuration)
-                    .collect(Collectors.toList());
-
-            Duration totalDuration = Duration.ZERO;
-            for (Duration duration : skiftDuartions) {
-                totalDuration = totalDuration.plus(duration);
-            }
-
-            double sumHours = convertToHoursRoundedToNearestQuarter(totalDuration);
-            createCommonStyleCell(trailerRow, columnIndex).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
-        }
-    }
-
     private void insertDateIntoCell(Cell cell, LocalDate date, Workbook wb) {
         CellStyle cellStyleDate = wb.createCellStyle();
         cellStyleDate.setDataFormat(wb.createDataFormat().getFormat(DateFormatConverter.convert(Locale.getDefault(), "dd.MM.yy")));
         cellStyleDate.setAlignment(HorizontalAlignment.CENTER);
+        cellStyleDate.setBorderBottom(BorderStyle.THIN);
+        cellStyleDate.setBorderTop(BorderStyle.THIN);
+        cellStyleDate.setBorderLeft(BorderStyle.THIN);
+        cellStyleDate.setBorderRight(BorderStyle.THIN);
         cell.setCellStyle(cellStyleDate);
         cell.setCellValue(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
@@ -182,6 +169,10 @@ public class TjenesteplanExcelService {
     private Cell createCommonStyleCell(Row row, int columnIndex) {
         Cell cell = row.createCell(columnIndex);
         CellUtil.setAlignment(cell, HorizontalAlignment.CENTER);
+        CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
+        CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_TOP, BorderStyle.THIN);
+        CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_LEFT, BorderStyle.THIN);
+        CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_RIGHT, BorderStyle.THIN);
         return cell;
     }
 
