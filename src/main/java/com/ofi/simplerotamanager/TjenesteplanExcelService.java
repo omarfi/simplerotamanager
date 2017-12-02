@@ -25,8 +25,10 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 
 @Service
-public class TjenesteplanService {
-    byte[] genererTjenesteplan(Tjenesteplan tjenesteplan) throws IOException {
+public class TjenesteplanExcelService {
+
+
+    byte[] writeTjenesteplanToExcel(Tjenesteplan tjenesteplan) throws IOException {
 
         Workbook wb = new XSSFWorkbook();
         XSSFSheet sheet = (XSSFSheet) wb.createSheet();
@@ -71,9 +73,9 @@ public class TjenesteplanService {
             insertDayOfWeekIntoCell(row.createCell(0), date);
             insertDateIntoCell(row.createCell(1), date, wb);
 
-            for (int columnIndex = 2; columnIndex <= ansatte.size(); columnIndex += 2) {
+            for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
                 XSSFCell cellSkifter = row.createCell(columnIndex);
-                List<Skift> skifter = tjenesteplan.getSkifterForAnsattForDato(ansatte.get(columnIndex - 2), date);
+                List<Skift> skifter = tjenesteplan.getSkifterForAnsattForDato(ansatte.get(ansattIndex), date);
 
                 cellSkifter.setCellValue(skifter.stream().map(Skift::toString).collect(joining(",")));
 
@@ -124,11 +126,9 @@ public class TjenesteplanService {
         header.createCell(0).setCellValue("DAG");
         header.createCell(1).setCellValue("DATO");
 
-        for (int columnIndex = 0; columnIndex < ansatte.size(); columnIndex += 2) {
-            XSSFCell cellName = header.createCell(columnIndex + 2);
-            cellName.setCellValue(ansatte.get(columnIndex));
-            XSSFCell cellHours = header.createCell(columnIndex + 3);
-            cellHours.setCellValue("T");
+        for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
+            header.createCell(columnIndex).setCellValue(ansatte.get(ansattIndex));
+            header.createCell(columnIndex + 1).setCellValue("T");
         }
     }
 
@@ -136,9 +136,9 @@ public class TjenesteplanService {
         XSSFRow trailerRow = sheet.createRow(rowIndex);
         trailerRow.createCell(0).setCellValue("SUM");
 
-        for (int columnIndex = 3; columnIndex <= ansatte.size(); columnIndex += 2) {
+        for (int ansattIndex = 0, columnIndex = 3; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
             List<Duration> skiftDuartions = tjenesteplan
-                    .getSkifterForAnsatt(ansatte.get(columnIndex - 3))
+                    .getSkifterForAnsatt(ansatte.get(ansattIndex))
                     .stream()
                     .map(Skift::getDuration)
                     .collect(Collectors.toList());
@@ -161,9 +161,8 @@ public class TjenesteplanService {
     }
 
     private void insertDayOfWeekIntoCell(XSSFCell cell, LocalDate date) {
-        String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.forLanguageTag("no-NO"));
-        StringUtils.capitalize(dayOfWeek);
-        cell.setCellValue(dayOfWeek);
+        String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, App.LOCALE);
+        cell.setCellValue(StringUtils.capitalize(dayOfWeek));
     }
 
     private void resizeColumns(XSSFSheet sheet, int noOfColumns) {

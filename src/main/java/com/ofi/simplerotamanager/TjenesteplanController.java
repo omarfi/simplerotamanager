@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.format.TextStyle;
 import java.util.List;
 
 @Controller
@@ -23,11 +24,11 @@ public class TjenesteplanController {
     static final String SESSION_ATTR_TJENESTEPLAN = "tjenesteplan";
     static final String SESSION_ATTR_TJENESTEPLAN_FILNAVN = "tjenesteplan-filnavn";
 
-    private final TjenesteplanService tjenesteplanService;
+    private final TjenesteplanExcelService tjenesteplanExcelService;
 
     @Autowired
-    public TjenesteplanController(TjenesteplanService tjenesteplanService) {
-        this.tjenesteplanService = tjenesteplanService;
+    public TjenesteplanController(TjenesteplanExcelService tjenesteplanExcelService) {
+        this.tjenesteplanExcelService = tjenesteplanExcelService;
     }
 
     @RequestMapping(path = "/genererTjenesteplan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -36,10 +37,10 @@ public class TjenesteplanController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         Tjenesteplan tjenesteplan = new Tjenesteplan(skifter);
-        byte[] data = tjenesteplanService.genererTjenesteplan(tjenesteplan);
+        byte[] data = tjenesteplanExcelService.writeTjenesteplanToExcel(tjenesteplan);
 
         String filnavn = "Tjenesteplan "
-                + tjenesteplan.getManed()
+                + tjenesteplan.getManed().getDisplayName(TextStyle.FULL, App.LOCALE)
                 + " " + tjenesteplan.getAar()
                 + ".xlsx";
 

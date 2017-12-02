@@ -51,13 +51,13 @@ public class TjenesteplanControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private TjenesteplanService tjenesteplanService;
+    private TjenesteplanExcelService tjenesteplanExcelService;
 
     @Test
     public void genererTjenesteplan() throws Exception {
         ArgumentCaptor<Tjenesteplan> tjenesteplanArgumentCaptor = ArgumentCaptor.forClass(Tjenesteplan.class);
 
-        when(tjenesteplanService.genererTjenesteplan(tjenesteplanArgumentCaptor.capture())).thenReturn(TJENESTEPLAN_FILE);
+        when(tjenesteplanExcelService.writeTjenesteplanToExcel(tjenesteplanArgumentCaptor.capture())).thenReturn(TJENESTEPLAN_FILE);
 
         MvcResult mvcResult = mvc.perform(post("/genererTjenesteplan")
                 .contentType(MediaType.APPLICATION_JSON)
