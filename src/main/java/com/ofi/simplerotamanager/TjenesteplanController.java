@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.format.TextStyle;
 import java.util.List;
 
 @Controller
@@ -39,10 +38,7 @@ public class TjenesteplanController {
         Tjenesteplan tjenesteplan = new Tjenesteplan(skifter);
         byte[] data = tjenesteplanExcelService.writeTjenesteplanToExcel(tjenesteplan);
 
-        String filnavn = "Tjenesteplan "
-                + tjenesteplan.getManed().getDisplayName(TextStyle.FULL, App.LOCALE)
-                + " " + tjenesteplan.getAar()
-                + ".xlsx";
+        String filnavn = tjenesteplan + ".xlsx";
 
         request.getSession().setAttribute(SESSION_ATTR_TJENESTEPLAN, data);
         request.getSession().setAttribute(SESSION_ATTR_TJENESTEPLAN_FILNAVN, filnavn);
@@ -70,6 +66,4 @@ public class TjenesteplanController {
             request.getSession().removeAttribute(SESSION_ATTR_TJENESTEPLAN_FILNAVN);
         }
     }
-
-
 }

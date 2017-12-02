@@ -66,11 +66,11 @@ public class TjenesteplanControllerTest {
                 .andExpect(content().string("Tjenesteplan generert"))
                 .andReturn();
 
+        Tjenesteplan tjenesteplan = tjenesteplanArgumentCaptor.getValue();
+
         HttpSession session = mvcResult.getRequest().getSession();
         assertEquals(session.getAttribute(TjenesteplanController.SESSION_ATTR_TJENESTEPLAN), TJENESTEPLAN_FILE);
-        assertTrue(((String) session.getAttribute(TjenesteplanController.SESSION_ATTR_TJENESTEPLAN_FILNAVN)).endsWith("xlsx"));
-
-        Tjenesteplan tjenesteplan = tjenesteplanArgumentCaptor.getValue();
+        assertTrue(session.getAttribute(TjenesteplanController.SESSION_ATTR_TJENESTEPLAN_FILNAVN).equals(tjenesteplan + ".xlsx"));
 
         assertEquals(tjenesteplan.getManed(), Month.JANUARY);
         assertEquals(tjenesteplan.getAar(), 2017);

@@ -1,6 +1,7 @@
 package com.ofi.simplerotamanager;
 
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -26,48 +27,24 @@ import static java.util.stream.Collectors.joining;
 @Service
 public class TjenesteplanExcelService {
 
-
     byte[] writeTjenesteplanToExcel(Tjenesteplan tjenesteplan) throws IOException {
 
         Workbook wb = new XSSFWorkbook();
         XSSFSheet sheet = (XSSFSheet) wb.createSheet();
-
-/*
-        CTTable cttable = sheet.createTable().getCTTable();
-        CTTableStyleInfo tableStyle = cttable.addNewTableStyleInfo();
-        tableStyle.setName("TableStyleMedium9");
-        tableStyle.setShowColumnStripes(false);
-        tableStyle.setShowRowStripes(true);
-
-        cttable.setRef(new AreaReference(new CellReference(0, 0), new CellReference(rows.size(), reportType.getColumns().size() - 1)).formatAsString());
-        cttable.setDisplayName(reportType.toString());
-        cttable.setName(reportType.toString());
-        cttable.setId(1L);
-
-        CTTableColumns columns = cttable.addNewTableColumns();
-        cttable.addNewAutoFilter();
-        columns.setCount(reportType.getColumns().size());
-
-        XSSFRow heading = sheet.createRow((short) 0);
-
-        for (int columnIndex = 0; columnIndex < reportType.getColumns().size(); columnIndex++) {
-            String column = reportType.getColumns().get(columnIndex);
-
-            CTTableColumn ctTableColumn = columns.addNewTableColumn();
-            ctTableColumn.setName(column);
-            ctTableColumn.setId(columnIndex + 1L);
-            heading.createCell(columnIndex).setCellValue(column);
-        }
-*/
+        customizePrintSetup(sheet);
 
         List<String> ansatte = tjenesteplan.getAnsatte();
 
-        generateHeaderRow(ansatte, sheet);
+        int totalNoOfColumns = (ansatte.size() * 2) + 2;
+        int rowIndex = 0;
 
-        int rowIndex;
-        for (rowIndex = 1; rowIndex <= tjenesteplan.getManed().length(Year.isLeap(tjenesteplan.getAar())); rowIndex++) {
-            XSSFRow row = sheet.createRow(rowIndex);
-            LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), rowIndex);
+        generateTitleRow(tjenesteplan, wb, sheet, totalNoOfColumns, rowIndex);
+        generateHeaderRow(ansatte, sheet, ++rowIndex);
+
+        rowIndex++;
+        for (int dateIndex = 1; dateIndex <= tjenesteplan.getManed().length(Year.isLeap(tjenesteplan.getAar())); dateIndex++, rowIndex++) {
+            XSSFRow row = createCommonStyleRow(sheet, rowIndex);
+            LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), dateIndex);
 
             insertDayOfWeekIntoCell(createCommonStyleCell(row, 0), date);
             insertDateIntoCell(createCommonStyleCell(row, 1), date, wb);
@@ -115,12 +92,43 @@ public class TjenesteplanExcelService {
             }
         }*/
 
-        resizeColumnsToFitContent(sheet, (ansatte.size() * 2) + 2);
+        resizeColumnsToFitContent(sheet, totalNoOfColumns);
         return writeExcelToBytes(wb);
     }
 
-    private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet) {
-        XSSFRow header = sheet.createRow(0);
+    private void customizePrintSetup(XSSFSheet sheet) {
+        double margin = 0.1;
+        sheet.setFitToPage(true);
+        sheet.setHorizontallyCenter(true);
+        sheet.setVerticallyCenter(true);
+        sheet.setMargin(Sheet.LeftMargin, margin);
+        sheet.setMargin(Sheet.RightMargin, margin);
+        sheet.setMargin(Sheet.TopMargin, margin);
+        sheet.setMargin(Sheet.BottomMargin, margin);
+        sheet.getPrintSetup().setFooterMargin(margin);
+        sheet.getPrintSetup().setHeaderMargin(margin);
+        sheet.getPrintSetup().setOrientation(PrintOrientation.LANDSCAPE);
+        sheet.getPrintSetup().setPaperSize(PaperSize.A4_PAPER);
+    }
+
+    private void generateTitleRow(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, int totalNoOfColumns, int rowIndex) {
+        XSSFRow titleRow = createCommonStyleRow(sheet, rowIndex);
+        titleRow.setHeight((short) 900);
+
+        Cell cell = createCommonStyleCell(titleRow, 0);
+        cell.setCellValue(tjenesteplan.toString());
+
+        Font font = wb.createFont();
+        font.setBold(true);
+        font.setFontHeight((short) 300);
+        CellUtil.setFont(cell, font);
+        CellUtil.setVerticalAlignment(cell, VerticalAlignment.CENTER);
+
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, totalNoOfColumns - 1));
+    }
+
+    private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet, int rowIndex) {
+        XSSFRow header = createCommonStyleRow(sheet, rowIndex);
 
         createCommonStyleCell(header, 0).setCellValue("DAG");
         createCommonStyleCell(header, 1).setCellValue("DATO");
@@ -132,7 +140,7 @@ public class TjenesteplanExcelService {
     }
 
     private void generateTrailerRow(Tjenesteplan tjenesteplan, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
-        XSSFRow trailerRow = sheet.createRow(rowIndex);
+        XSSFRow trailerRow = createCommonStyleRow(sheet, rowIndex);
         createCommonStyleCell(trailerRow, 0).setCellValue("SUM");
 
         for (int ansattIndex = 0, columnIndex = 3; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
@@ -163,6 +171,12 @@ public class TjenesteplanExcelService {
     private void insertDayOfWeekIntoCell(Cell cell, LocalDate date) {
         String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, App.LOCALE);
         cell.setCellValue(StringUtils.capitalize(dayOfWeek));
+    }
+
+    private XSSFRow createCommonStyleRow(XSSFSheet sheet, int rowIndex) {
+        XSSFRow row = sheet.createRow(rowIndex);
+        row.setHeight((short) 350);
+        return row;
     }
 
     private Cell createCommonStyleCell(Row row, int columnIndex) {

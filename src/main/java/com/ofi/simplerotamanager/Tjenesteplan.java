@@ -2,6 +2,7 @@ package com.ofi.simplerotamanager;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,5 +39,10 @@ class Tjenesteplan {
                 .filter(skift -> skift.getAnsattNavn().equals(ansattNavn))
                 .filter(skift -> skift.getStartTid().toLocalDate().isEqual(dato))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String toString() {
+        return "Tjenesteplan " + getManed().getDisplayName(TextStyle.FULL, App.LOCALE).toUpperCase() + " " + getAar();
     }
 }
