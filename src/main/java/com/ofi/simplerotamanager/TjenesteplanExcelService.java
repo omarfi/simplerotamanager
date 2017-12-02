@@ -1,9 +1,8 @@
 package com.ofi.simplerotamanager;
 
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -70,14 +69,14 @@ public class TjenesteplanExcelService {
             XSSFRow row = sheet.createRow(rowIndex);
             LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), rowIndex);
 
-            insertDayOfWeekIntoCell(row.createCell(0), date);
-            insertDateIntoCell(row.createCell(1), date, wb);
+            insertDayOfWeekIntoCell(createCommonStyleCell(row, 0), date);
+            insertDateIntoCell(createCommonStyleCell(row, 1), date, wb);
 
             for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-                XSSFCell cellSkifter = row.createCell(columnIndex);
+                Cell cellSkifter = createCommonStyleCell(row, columnIndex);
                 List<Skift> skifter = tjenesteplan.getSkifterForAnsattForDato(ansatte.get(ansattIndex), date);
 
-                cellSkifter.setCellValue(skifter.stream().map(Skift::toString).collect(joining(",")));
+                cellSkifter.setCellValue(skifter.stream().map(Skift::toString).collect(joining(", ")));
 
                 Duration totalDuration = Duration.ZERO;
                 for (Skift skift : skifter) {
@@ -86,7 +85,7 @@ public class TjenesteplanExcelService {
 
                 double hours = convertToHoursRoundedToNearestQuarter(totalDuration);
                 if (hours != 0) {
-                    row.createCell(columnIndex + 1).setCellValue(hours % 1 == 0 ? (int) hours : hours);
+                    createCommonStyleCell(row, columnIndex + 1).setCellValue(hours % 1 == 0 ? (int) hours : hours);
                 }
             }
         }
@@ -116,25 +115,25 @@ public class TjenesteplanExcelService {
             }
         }*/
 
-        resizeColumns(sheet, ansatte.size());
+        resizeColumnsToFitContent(sheet, (ansatte.size() * 2) + 2);
         return writeExcelToBytes(wb);
     }
 
     private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet) {
         XSSFRow header = sheet.createRow(0);
 
-        header.createCell(0).setCellValue("DAG");
-        header.createCell(1).setCellValue("DATO");
+        createCommonStyleCell(header, 0).setCellValue("DAG");
+        createCommonStyleCell(header, 1).setCellValue("DATO");
 
         for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-            header.createCell(columnIndex).setCellValue(ansatte.get(ansattIndex));
-            header.createCell(columnIndex + 1).setCellValue("T");
+            createCommonStyleCell(header, columnIndex).setCellValue(ansatte.get(ansattIndex));
+            createCommonStyleCell(header, columnIndex + 1).setCellValue("T");
         }
     }
 
     private void generateTrailerRow(Tjenesteplan tjenesteplan, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
         XSSFRow trailerRow = sheet.createRow(rowIndex);
-        trailerRow.createCell(0).setCellValue("SUM");
+        createCommonStyleCell(trailerRow, 0).setCellValue("SUM");
 
         for (int ansattIndex = 0, columnIndex = 3; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
             List<Duration> skiftDuartions = tjenesteplan
@@ -149,26 +148,33 @@ public class TjenesteplanExcelService {
             }
 
             double sumHours = convertToHoursRoundedToNearestQuarter(totalDuration);
-            trailerRow.createCell(columnIndex).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
+            createCommonStyleCell(trailerRow, columnIndex).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
         }
     }
 
-    private void insertDateIntoCell(XSSFCell cell, LocalDate date, Workbook wb) {
+    private void insertDateIntoCell(Cell cell, LocalDate date, Workbook wb) {
         CellStyle cellStyleDate = wb.createCellStyle();
         cellStyleDate.setDataFormat(wb.createDataFormat().getFormat(DateFormatConverter.convert(Locale.getDefault(), "dd.MM.yy")));
+        cellStyleDate.setAlignment(HorizontalAlignment.CENTER);
         cell.setCellStyle(cellStyleDate);
         cell.setCellValue(Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()));
     }
 
-    private void insertDayOfWeekIntoCell(XSSFCell cell, LocalDate date) {
+    private void insertDayOfWeekIntoCell(Cell cell, LocalDate date) {
         String dayOfWeek = date.getDayOfWeek().getDisplayName(TextStyle.FULL, App.LOCALE);
         cell.setCellValue(StringUtils.capitalize(dayOfWeek));
     }
 
-    private void resizeColumns(XSSFSheet sheet, int noOfColumns) {
+    private Cell createCommonStyleCell(Row row, int columnIndex) {
+        Cell cell = row.createCell(columnIndex);
+        CellUtil.setAlignment(cell, HorizontalAlignment.CENTER);
+        return cell;
+    }
+
+    private void resizeColumnsToFitContent(XSSFSheet sheet, int noOfColumns) {
         for (int columnIndex = 0; columnIndex <= noOfColumns; columnIndex++) {
             sheet.autoSizeColumn(columnIndex);
-            sheet.setColumnWidth(columnIndex, sheet.getColumnWidth(columnIndex) + 700);
+            sheet.setColumnWidth(columnIndex, sheet.getColumnWidth(columnIndex) + 300);
         }
     }
 
