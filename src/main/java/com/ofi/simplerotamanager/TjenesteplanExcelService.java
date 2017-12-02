@@ -145,7 +145,7 @@ public class TjenesteplanExcelService {
 
     private void insertDateIntoCell(Cell cell, LocalDate date, Workbook wb) {
         CellStyle cellStyleDate = wb.createCellStyle();
-        cellStyleDate.setDataFormat(wb.createDataFormat().getFormat(DateFormatConverter.convert(Locale.getDefault(), "dd.MM.yy")));
+        cellStyleDate.setDataFormat(wb.createDataFormat().getFormat(DateFormatConverter.convert(Locale.getDefault(), "dd. MMM")));
         cellStyleDate.setAlignment(HorizontalAlignment.CENTER);
         cellStyleDate.setBorderBottom(BorderStyle.THIN);
         cellStyleDate.setBorderTop(BorderStyle.THIN);
