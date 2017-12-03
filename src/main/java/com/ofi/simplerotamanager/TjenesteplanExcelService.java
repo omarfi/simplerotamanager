@@ -4,18 +4,13 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellUtil;
 import org.apache.poi.ss.util.DateFormatConverter;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.Year;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.TextStyle;
 import java.util.Date;
 import java.util.List;
@@ -42,12 +37,15 @@ public class TjenesteplanExcelService {
         rowIndex = generateDataRows(tjenesteplan, wb, sheet, ansatte, ++rowIndex);
         generateTrailerRow(tjenesteplan, sheet, ansatte, rowIndex);
 
+        boldHeaderRow(wb, sheet);
+        colorWeekendRows(tjenesteplan, sheet);
+        colorRow(sheet.getRow(sheet.getLastRowNum()), new XSSFColor(new java.awt.Color(255, 253, 118)));
         resizeColumnsToFitContent(sheet, totalNoOfColumns);
-        return writeExcelToBytes(wb);
+        return writeWorkbookToBytes(wb);
     }
 
     private void generateTitleRow(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, int totalNoOfColumns, int rowIndex) {
-        XSSFRow titleRow = createCommonStyleRow(sheet, rowIndex);
+        XSSFRow titleRow = createDefaultStyleRow(sheet, rowIndex);
         titleRow.setHeight((short) 900);
 
         Cell cell = titleRow.createCell(0);
@@ -64,27 +62,27 @@ public class TjenesteplanExcelService {
     }
 
     private void generateHeaderRow(List<String> ansatte, XSSFSheet sheet, int rowIndex) {
-        XSSFRow header = createCommonStyleRow(sheet, rowIndex);
+        XSSFRow header = createDefaultStyleRow(sheet, rowIndex);
 
-        createCommonStyleCell(header, 0).setCellValue("DAG");
-        createCommonStyleCell(header, 1).setCellValue("DATO");
+        createDefaultStyleCell(header, 0).setCellValue("DAG");
+        createDefaultStyleCell(header, 1).setCellValue("DATO");
 
         for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-            createCommonStyleCell(header, columnIndex).setCellValue(ansatte.get(ansattIndex));
-            createCommonStyleCell(header, columnIndex + 1).setCellValue("T");
+            createDefaultStyleCell(header, columnIndex).setCellValue(ansatte.get(ansattIndex));
+            createDefaultStyleCell(header, columnIndex + 1).setCellValue("T");
         }
     }
 
     private int generateDataRows(Tjenesteplan tjenesteplan, Workbook wb, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
         for (int dateIndex = 1; dateIndex <= tjenesteplan.getManed().length(Year.isLeap(tjenesteplan.getAar())); dateIndex++, rowIndex++) {
-            XSSFRow row = createCommonStyleRow(sheet, rowIndex);
+            XSSFRow row = createDefaultStyleRow(sheet, rowIndex);
             LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), dateIndex);
 
-            insertDayOfWeekIntoCell(createCommonStyleCell(row, 0), date);
-            insertDateIntoCell(createCommonStyleCell(row, 1), date, wb);
+            insertDayOfWeekIntoCell(createDefaultStyleCell(row, 0), date);
+            insertDateIntoCell(createDefaultStyleCell(row, 1), date, wb);
 
             for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-                Cell cellSkifter = createCommonStyleCell(row, columnIndex);
+                Cell cellSkifter = createDefaultStyleCell(row, columnIndex);
                 List<Skift> skifter = tjenesteplan.getSkifterForAnsattForDato(ansatte.get(ansattIndex), date);
 
                 cellSkifter.setCellValue(skifter.stream().map(Skift::toString).collect(joining(", ")));
@@ -95,7 +93,7 @@ public class TjenesteplanExcelService {
                 }
 
                 double hours = convertToHoursRoundedToNearestQuarter(totalDuration);
-                Cell cellHours = createCommonStyleCell(row, columnIndex + 1);
+                Cell cellHours = createDefaultStyleCell(row, columnIndex + 1);
                 if (hours != 0) {
                     cellHours.setCellValue(hours % 1 == 0 ? (int) hours : hours);
                 }
@@ -105,12 +103,12 @@ public class TjenesteplanExcelService {
     }
 
     private void generateTrailerRow(Tjenesteplan tjenesteplan, XSSFSheet sheet, List<String> ansatte, int rowIndex) {
-        XSSFRow trailerRow = createCommonStyleRow(sheet, rowIndex);
-        createCommonStyleCell(trailerRow, 0).setCellValue("SUM");
-        createCommonStyleCell(trailerRow, 1);
+        XSSFRow trailerRow = createDefaultStyleRow(sheet, rowIndex);
+        createDefaultStyleCell(trailerRow, 0).setCellValue("SUM");
+        createDefaultStyleCell(trailerRow, 1);
 
         for (int ansattIndex = 0, columnIndex = 2; ansattIndex < ansatte.size(); ansattIndex++, columnIndex += 2) {
-            createCommonStyleCell(trailerRow, columnIndex);
+            createDefaultStyleCell(trailerRow, columnIndex);
 
             List<Duration> skiftDuartions = tjenesteplan
                     .getSkifterForAnsatt(ansatte.get(ansattIndex))
@@ -124,7 +122,7 @@ public class TjenesteplanExcelService {
             }
 
             double sumHours = convertToHoursRoundedToNearestQuarter(totalDuration);
-            createCommonStyleCell(trailerRow, columnIndex + 1).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
+            createDefaultStyleCell(trailerRow, columnIndex + 1).setCellValue(sumHours % 1 == 0 ? (int) sumHours : sumHours);
         }
     }
 
@@ -160,13 +158,13 @@ public class TjenesteplanExcelService {
         cell.setCellValue(StringUtils.capitalize(dayOfWeek));
     }
 
-    private XSSFRow createCommonStyleRow(XSSFSheet sheet, int rowIndex) {
+    private XSSFRow createDefaultStyleRow(XSSFSheet sheet, int rowIndex) {
         XSSFRow row = sheet.createRow(rowIndex);
         row.setHeight((short) 350);
         return row;
     }
 
-    private Cell createCommonStyleCell(Row row, int columnIndex) {
+    private Cell createDefaultStyleCell(Row row, int columnIndex) {
         Cell cell = row.createCell(columnIndex);
         CellUtil.setAlignment(cell, HorizontalAlignment.CENTER);
         CellUtil.setCellStyleProperty(cell, CellUtil.BORDER_BOTTOM, BorderStyle.THIN);
@@ -176,6 +174,38 @@ public class TjenesteplanExcelService {
         return cell;
     }
 
+    private void boldHeaderRow(Workbook wb, XSSFSheet sheet) {
+        Font font = wb.createFont();
+        font.setBold(true);
+
+        int headerRowIndex = 1;
+        XSSFRow row = sheet.getRow(headerRowIndex);
+        for (int cellNum = 0; cellNum < row.getLastCellNum(); cellNum++) {
+            CellUtil.setFont(row.getCell(cellNum), font);
+        }
+    }
+
+    private void colorWeekendRows(Tjenesteplan tjenesteplan, XSSFSheet sheet) {
+        for (int dateIndex = 1, rowNum = 2; dateIndex <= tjenesteplan.getManed().length(Year.isLeap(tjenesteplan.getAar())); dateIndex++, rowNum++) {
+            LocalDate date = LocalDate.of(tjenesteplan.getAar(), tjenesteplan.getManed(), dateIndex);
+            if (date.getDayOfWeek() == DayOfWeek.SATURDAY) {
+                colorRow(sheet.getRow(rowNum), new XSSFColor(new java.awt.Color(180, 231, 255)));
+            } else if (date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                colorRow(sheet.getRow(rowNum), new XSSFColor(new java.awt.Color(255, 146, 133)));
+            }
+        }
+    }
+
+    private void colorRow(XSSFRow row, XSSFColor color) {
+        for (int cellNum = 0; cellNum < row.getLastCellNum(); cellNum++) {
+            XSSFCell cell = row.getCell(cellNum);
+            XSSFCellStyle cellStyle = (XSSFCellStyle) cell.getCellStyle().clone();
+            cellStyle.setFillForegroundColor(color);
+            cellStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            cell.setCellStyle(cellStyle);
+        }
+    }
+
     private void resizeColumnsToFitContent(XSSFSheet sheet, int noOfColumns) {
         for (int columnIndex = 0; columnIndex <= noOfColumns; columnIndex++) {
             sheet.autoSizeColumn(columnIndex);
@@ -183,7 +213,7 @@ public class TjenesteplanExcelService {
         }
     }
 
-    private byte[] writeExcelToBytes(Workbook wb) throws IOException {
+    private byte[] writeWorkbookToBytes(Workbook wb) throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         wb.write(byteArrayOutputStream);
         wb.close();
