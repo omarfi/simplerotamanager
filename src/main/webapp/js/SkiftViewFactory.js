@@ -10,7 +10,7 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors, moment) {
                 vm.erHelgeskift = vm.event.startsAt.getDay() === 0 || vm.event.startsAt.getDay() === 6;
                 vm.heading = moment(vm.event.startsAt).format("dddd, Do MMMM YYYY");
 
-                vm.skiftTimeChanged = function () {
+                vm.startTimeChanged = function () {
                     if (vm.event.startsAt > vm.event.endsAt) {
                         vm.event.endsAt = vm.event.startsAt;
                     }

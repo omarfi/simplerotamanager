@@ -20,15 +20,14 @@
              hour-step="1"
              minute-step="15"
              show-meridian="false"
-             ng-change="vm.skiftTimeChanged()">
+             ng-change="vm.startTimeChanged()">
         </div>
 
         <div id="sluttTid" class="col-xs-3"
              uib-timepicker
              ng-model="vm.event.endsAt"
              minute-step="15"
-             show-meridian="false"
-             ng-change="vm.skiftTimeChanged()">
+             show-meridian="false">
         </div>
 
         <div class="col-xs-3">
