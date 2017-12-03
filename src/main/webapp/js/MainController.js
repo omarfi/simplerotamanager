@@ -67,16 +67,26 @@ SRMApp.controller('MainController', function ($location, $http, $window, moment,
     };
 
     function createRequestData() {
+        function to2digitFormat(number) {
+
+            return ("0" + number).slice(-2);
+        }
+
+        function formatDate(date) {
+
+            return to2digitFormat(date.getDate()) + "."
+                + to2digitFormat(date.getMonth() + 1) + "."
+                + date.getFullYear() + ", "
+                + to2digitFormat(date.getHours()) + ":"
+                + to2digitFormat(date.getMinutes()) + ":"
+                + to2digitFormat(date.getSeconds());
+        }
+
         var data = angular.copy(vm.events);
 
-        var options = {
-            hour12: false, year: 'numeric', month: "2-digit", day: "2-digit",
-            hour: "2-digit", minute: "2-digit", second: "2-digit"
-        };
-
         for (var i = 0; i < vm.events.length; i++) {
-            data[i].startsAt = vm.events[i].startsAt.toLocaleString({}, options);
-            data[i].endsAt = vm.events[i].endsAt.toLocaleString({}, options);
+            data[i].startsAt = formatDate(vm.events[i].startsAt);
+            data[i].endsAt = formatDate(vm.events[i].endsAt);
         }
         return data;
     }
