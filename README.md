@@ -10,12 +10,12 @@ Applikasjonen er i produksjon på:
 
 https://ofirotamanager.herokuapp.com/
 
-Grensesnittet skal være intuitivt. For å populere dagene med skifter benyttes knappen "Legg inn skift" og deretter taster inn navn på ansatt, start tid og slutt tid. Skiftet kan gjøres repeterbar ved å kopiere til relevante dager. 
+Grensesnittet skal være intuitivt. For å populere dagene med skifter benyttes knappen "Legg til ny skift" og deretter tastes inn navn på ansatt, start tid og slutt tid. Skiftet kan gjøres repeterbar ved å kopiere til relevante dager. Etter å ha lagt inn et skift, er det også mulig å endre eller slette skiftet samt flytte den til andre dager med drag&drop.
 
 Etter at alle skiftene er lagt inn kan knappen "Generer tjenesteplan" benyttes for å produsere en excel fil som inneholder en skiftplan i en tabell med predefinert format, klar for utskrift. Ytterligere justeringer kan utføres direkte i excel.
 
 ### Begrensninger:
-Det er foreløpig ikke mulig å legge inn en skift som strekker over flere datoer (typisk nattskift). Se [issue#1](https://github.com/omarfi/simplerotamanager/issues/1) 
+Det er foreløpig ikke mulig å legge inn en skift som strekker over flere kalenderdager (typisk nattskift). Se [issue#1](https://github.com/omarfi/simplerotamanager/issues/1) 
 
 ## Teknologier og rammeverk
 Applikasjonen bygger seg på 
@@ -27,3 +27,20 @@ Applikasjonen bygger seg på
 - [Angular Bootstrap Calendar](https://github.com/mattlewis92/angular-bootstrap-calendar)
 - [Bootstrap](http://getbootstrap.com/)
 - [Bower](https://bower.io/)
+
+## Lokal utvikling
+Applikasjonen kan enkelt kjøres lokalt med Spring boot, ved å klone den og bygge den med Maven:
+
+`mvn clean install`
+
+Det er også mulig å invokere main metoden i App.java direkte.
+
+Bower komponenter er sjekket inn, så det skal ikke være behov for å installere disse via bower. 
+
+## Continuous deployment
+Alle commits til dev-branch blir auto deployet til produksjon via Heroku.
+
+
+
+
+
