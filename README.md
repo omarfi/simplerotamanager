@@ -14,9 +14,6 @@ Grensesnittet skal være intuitivt. For å populere dagene med skifter benyttes 
 
 Etter at alle skiftene er lagt inn kan knappen "Generer tjenesteplan" benyttes for å produsere en excel fil som inneholder en skiftplan i en tabell med predefinert format, klar for utskrift. Ytterligere justeringer kan utføres direkte i excel.
 
-### Begrensninger:
-Det er foreløpig ikke mulig å legge inn en skift som strekker over flere kalenderdager (typisk nattskift). Se [issue#1](https://github.com/omarfi/simplerotamanager/issues/1) 
-
 ## Teknologier og rammeverk
 Applikasjonen bygger seg på 
 - [JAVA 8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
