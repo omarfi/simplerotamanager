@@ -8,13 +8,14 @@
     </div>
 
     <div class="row">
-        <div class="col-xs-3 col-xs-offset-1 text-center">Start tid:</div>
-        <div class="col-xs-3 text-center">Slutt tid:</div>
-        <div class="col-xs-3">Kopier til:</div>
+        <div class="col-xs-6 text-center">Start tid:</div>
+        <div class="col-xs-4 col-xs-offset-1 text-center">Slutt tid: <input style="margin-left: 10px" type="checkbox"
+                                                                            ng-model="vm.sluttSkiftNesteDag"> Neste dag
+        </div>
     </div>
 
     <div class="row">
-        <div id="startTid" class="col-xs-3 col-xs-offset-1"
+        <div id="startTid" class="col-xs-6" style="text-align:-webkit-center"
              uib-timepicker
              ng-model="vm.event.startsAt"
              hour-step="1"
@@ -23,40 +24,44 @@
              ng-change="vm.startTimeChanged()">
         </div>
 
-        <div id="sluttTid" class="col-xs-3"
+        <div id="sluttTid" class="col-xs-4" style="text-align:-webkit-center"
              uib-timepicker
              ng-model="vm.event.endsAt"
              minute-step="15"
              show-meridian="false">
         </div>
 
+    </div>
+    <div class="row" style="margin: 10px">
+        <div class="col-xs-12">Kopier til:</div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 col-xs-offset-1">
+            <label style="font-weight:normal">
+                <input type="radio" name="ukentlig" value="ukentlig" ng-model="vm.skiftFrekvens">
+                Alle {{vm.getDagPrefix()}}dager
+            </label>
+        </div>
+        <div class="col-xs-3" ng-hide="vm.erHelgeskift">
+            <label style="font-weight:normal">
+                <input type="radio" name="hverdager" value="hverdager" ng-model="vm.skiftFrekvens">
+                Alle hverdager
+            </label>
+        </div>
+        <div class="col-xs-3" ng-show="vm.erHelgeskift">
+            <label style="font-weight:normal">
+                <input type="radio" name="helg" value="helg" ng-model="vm.skiftFrekvens">
+                Alle helgedager
+            </label>
+        </div>
         <div class="col-xs-3">
-            <div class="radio">
-                <label>
-                    <input type="radio" name="ukentlig" value="ukentlig" ng-model="vm.skiftFrekvens">
-                    Alle {{vm.getDagPrefix()}}dager
-                </label>
-            </div>
-            <div class="radio" ng-hide="vm.erHelgeskift">
-                <label>
-                    <input type="radio" name="hverdager" value="hverdager" ng-model="vm.skiftFrekvens">
-                    Alle hverdager
-                </label>
-            </div>
-            <div class="radio" ng-show="vm.erHelgeskift">
-                <label>
-                    <input type="radio" name="helg" value="helg" ng-model="vm.skiftFrekvens">
-                    Alle helgedager
-                </label>
-            </div>
-            <div class="radio">
-                <label>
-                    <input type="radio" name="daglig" value="daglig" ng-model="vm.skiftFrekvens">
-                    Alle dager
-                </label>
-            </div>
+            <label style="font-weight:normal">
+                <input type="radio" name="daglig" value="daglig" ng-model="vm.skiftFrekvens">
+                Alle dager
+            </label>
         </div>
     </div>
+
 
 </div>
 <div class="modal-footer">

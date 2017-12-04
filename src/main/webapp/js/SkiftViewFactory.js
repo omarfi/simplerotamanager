@@ -85,6 +85,9 @@ SRMApp.factory('SkiftView', function ($uibModal, Colors, moment) {
                 }
 
                 vm.lagre = function () {
+                    if (vm.sluttSkiftNesteDag === true) {
+                        vm.event.endsAt.setDate(vm.event.endsAt.getDate() + 1);
+                    }
                     assignColor();
                     if (vm.skiftFrekvens === 'ukentlig') {
                         kopierSkiftTil([vm.event.startsAt.getDay()]);
