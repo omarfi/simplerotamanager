@@ -73,7 +73,7 @@
             view-title="vm.calendarTitle"
             view-date="vm.viewDate"
             on-event-click="vm.eventClicked(calendarEvent)"
-            on-event-times-changed="calendarEvent.startsAt = calendarNewEventStart; calendarEvent.endsAt = calendarNewEventEnd"
+            on-event-times-changed="vm.copySkift(calendarEvent, calendarNewEventStart, calendarNewEventEnd)"
             cell-is-open="vm.cellIsOpen"
             day-view-split="60"
             cell-auto-open-disabled="true"

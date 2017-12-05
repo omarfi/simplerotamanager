@@ -66,6 +66,13 @@ SRMApp.controller('MainController', function ($location, $http, $window, moment,
         }
     };
 
+    vm.copySkift = function (calendarEvent, calendarNewEventStart, calendarNewEventEnd) {
+        var copiedEvent = angular.copy(calendarEvent);
+        copiedEvent.startsAt = calendarNewEventStart;
+        copiedEvent.endsAt = calendarNewEventEnd;
+        vm.events.push(copiedEvent);
+    };
+
     function createRequestData() {
         function to2digitFormat(number) {
 
