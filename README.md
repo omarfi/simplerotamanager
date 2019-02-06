@@ -1,8 +1,5 @@
 # OFI Rota Manager (prototype)
 
-Applikasjonen er utviklet etter forespørsel fra en potensiell arbeidsgiver for å demonstrere tekniske ferdigheter, samtidig som den adresserer et reelt behov - utvikleren har benyttet anledning til å levere en prototype av en mer 
-omfattende løsning som er under arbeid.
-
 OFI Rota Manager har som mål å assistere butikkdrivere med å organisere sine ansattes skiftplaner på en tidseffektiv og brukervennlig måte. Den kommer med en praktisk og intuitiv brukergrensesnitt som muliggjør raskt generering av excel baserte tjenesteplaner.
 
 ## Bruk
