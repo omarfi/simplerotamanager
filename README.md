@@ -32,7 +32,7 @@ Det er også mulig å invokere main metoden i App.java direkte.
 Bower komponenter er sjekket inn, så det skal ikke være behov for å installere disse via bower. 
 
 ## Continuous deployment
-Alle commits til dev-branch blir auto deployet til produksjon via Heroku.
+Alle commits til dev-branch blir auto deployet til produksjon via Google Cloud run.
 
 
 

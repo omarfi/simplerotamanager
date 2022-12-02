@@ -109,7 +109,7 @@ SRMApp.controller('MainController', function ($location, $http, $window, moment,
 
         $http.post(url, createRequestData(), config).then(function (response) {
             if (response.status === 200) {
-                $window.location.href = $location.absUrl() + "/lastned";
+                $window.location.href = $location.absUrl() + "lastned";
             }
 
         }, function error(response) {

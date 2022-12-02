@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -46,7 +46,7 @@ public class TjenesteplanController {
         return ResponseEntity.ok("Tjenesteplan generert");
     }
 
-    @RequestMapping(path = "/lastned", method = RequestMethod.GET)
+    @RequestMapping(path = "lastned", method = RequestMethod.GET)
     public void lastNedTjenesteplan(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Object sessionedTjenesteplan = request.getSession().getAttribute(SESSION_ATTR_TJENESTEPLAN);
         if (sessionedTjenesteplan != null) {
