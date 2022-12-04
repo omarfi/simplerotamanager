@@ -1,16 +1,18 @@
 package com.ofi.simplerotamanager;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 public class TjenesteplanExcelServiceTest {
 
     @Test
-    public void convertToHoursRoundedToNearestQuarter() {
+    void convertToHoursRoundedToNearestQuarter() {
         assertEquals(TjenesteplanExcelService.convertToHoursRoundedToNearestQuarter(Duration.ZERO), 0.0, 0);
 
         assertEquals(TjenesteplanExcelService.convertToHoursRoundedToNearestQuarter(
