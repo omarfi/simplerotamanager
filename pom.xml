@@ -11,8 +11,6 @@
     <name>simplerotamanager</name>
     <description>Minimum viable product for OFI Rota Manager. Allows generation of employee rotas</description>
 
-
-
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
