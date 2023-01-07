@@ -66,6 +66,13 @@ SRMApp.controller('MainController', function ($location, $http, $window, moment,
         }
     };
 
+    vm.copySkift = function (calendarEvent, calendarNewEventStart, calendarNewEventEnd) {
+        var copiedEvent = angular.copy(calendarEvent);
+        copiedEvent.startsAt = calendarNewEventStart;
+        copiedEvent.endsAt = calendarNewEventEnd;
+        vm.events.push(copiedEvent);
+    };
+
     function createRequestData() {
         function to2digitFormat(number) {
 
@@ -102,7 +109,7 @@ SRMApp.controller('MainController', function ($location, $http, $window, moment,
 
         $http.post(url, createRequestData(), config).then(function (response) {
             if (response.status === 200) {
-                $window.location.href = $location.absUrl() + "/lastned";
+                $window.location.href = $location.absUrl() + "lastned";
             }
 
         }, function error(response) {

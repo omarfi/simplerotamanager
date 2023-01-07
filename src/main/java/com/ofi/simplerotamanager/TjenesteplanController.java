@@ -1,18 +1,15 @@
 package com.ofi.simplerotamanager;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -30,8 +27,8 @@ public class TjenesteplanController {
         this.tjenesteplanExcelService = tjenesteplanExcelService;
     }
 
-    @RequestMapping(path = "/genererTjenesteplan", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity genererTjenesteplan(@RequestBody List<Skift> skifter, HttpServletRequest request) throws IOException {
+    @PostMapping(path = "genererTjenesteplan")
+    public ResponseEntity<String> genererTjenesteplan(@RequestBody List<Skift> skifter, HttpServletRequest request) throws IOException {
         if (skifter.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
@@ -46,7 +43,7 @@ public class TjenesteplanController {
         return ResponseEntity.ok("Tjenesteplan generert");
     }
 
-    @RequestMapping(path = "/lastned", method = RequestMethod.GET)
+    @GetMapping(path = "lastned")
     public void lastNedTjenesteplan(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Object sessionedTjenesteplan = request.getSession().getAttribute(SESSION_ATTR_TJENESTEPLAN);
         if (sessionedTjenesteplan != null) {
