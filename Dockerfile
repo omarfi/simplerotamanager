@@ -1,5 +1,5 @@
-# Use an official Maven image for the build stage
-FROM maven:3.8.4-jdk-11 as builder
+# Use an official Maven image with JDK 17 for the build stage
+FROM maven:3.8.4-jdk-17 as builder
 
 # Set the working directory in the container
 WORKDIR /app
@@ -11,8 +11,8 @@ COPY src ./src
 # Build the application
 RUN mvn clean package
 
-# Use an official Java runtime as a base image for the running stage
-FROM openjdk:11-jre-slim
+# Use an official OpenJDK image with JDK 17 for the runtime stage
+FROM openjdk:17-slim
 
 # Set the working directory in the container
 WORKDIR /app
