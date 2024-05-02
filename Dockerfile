@@ -39,5 +39,7 @@ COPY --from=builder /app/target/*.jar app.jar
 # Copy the Angular web app from the webapp build stage to the static folder in the Spring Boot app
 COPY --from=webapp-builder /webapp /app/static
 
+RUN apt-get update && apt-get install -y fontconfig libfreetype6 && rm -rf /var/lib/apt/lists/*
+
 # Set the default command to execute the jar file
 CMD ["java", "-jar", "app.jar"]
